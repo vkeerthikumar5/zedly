@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-jakarta: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography Overrides for Admin Dashboard */
+.admin-dashboard h1, 
+.admin-dashboard h2, 
+.admin-dashboard h3, 
+.admin-dashboard h4, 
+.admin-dashboard h5, 
+.admin-dashboard h6,
+.admin-dashboard button,
+.admin-dashboard a,
+.admin-dashboard select,
+.admin-dashboard th,
+.admin-dashboard .ui-element {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
