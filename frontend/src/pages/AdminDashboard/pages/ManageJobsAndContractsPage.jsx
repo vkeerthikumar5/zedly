@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FileCheck, Users, Search, PhoneCall, MessageCircle, Star, BadgeCheck, X, CalendarClock, Edit, Trash, MoreVertical, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import api from '../../../api';
 import toast from 'react-hot-toast';
 
 import ActionBar from '../components/JobMarketplace/ActionBar';
@@ -25,10 +25,7 @@ export default function ManageJobsAndContractsPage() {
 
   const fetchJobs = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8000/api/jobs/', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/api/jobs/');
       setJobs(response.data);
     } catch (err) {
       console.error("Failed to fetch jobs:", err);
@@ -47,10 +44,7 @@ export default function ManageJobsAndContractsPage() {
   const handleDelete = async (jobId) => {
     if (!window.confirm("Are you sure you want to delete this job batch? This action cannot be undone.")) return;
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:8000/api/jobs/${jobId}/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/jobs/${jobId}/`);
       toast.success("Job batch deleted successfully!");
       fetchJobs();
     } catch (err) {
@@ -61,10 +55,7 @@ export default function ManageJobsAndContractsPage() {
   const handleCancelContract = async (bidId) => {
     if (!window.confirm("Are you sure you want to cancel this contract?")) return;
     try {
-      const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:8000/api/bids/${bidId}/cancel/`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post(`/api/bids/${bidId}/cancel/`, {});
       toast.success("Contract cancelled successfully!");
       fetchJobs();
     } catch (err) {

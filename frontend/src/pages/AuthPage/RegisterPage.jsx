@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Factory, EyeOff, User, Mail, Eye } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../api';
 import { useAuth } from '../../context/AuthContext';
 
 const fadeUp = {
@@ -30,7 +30,7 @@ export default function RegisterPage() {
     const mappedRole = role === 'export_house' ? 'admin' : 'subcontractor';
     
     try {
-        await axios.post('http://localhost:8000/api/auth/register/', {
+        await api.post('/api/auth/register/', {
             username: `${firstName} ${lastName}`.trim(),
             email,
             password,

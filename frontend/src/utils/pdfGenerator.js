@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import axios from 'axios';
+import api, { getMediaUrl } from '../api';
 import { toast } from 'react-hot-toast';
 
 /**
@@ -32,12 +32,8 @@ const getBase64Image = (url) => {
 
 export const generateContractPDF = async (job) => {
   try {
-    const token = localStorage.getItem('token');
-    
     // Fetch Admin Profile Data
-    const profileRes = await axios.get('http://localhost:8000/api/profile/', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const profileRes = await api.get('/api/profile/');
     const ehProfile = profileRes.data;
 
     // Initialize PDF (A4 Portrait)
@@ -268,7 +264,7 @@ export const generateContractPDF = async (job) => {
 
     // Load admin stamp and signature imagery if available
     if (ehProfile.company_stamp) {
-      const stampUrl = `http://localhost:8000${ehProfile.company_stamp}`;
+      const stampUrl = getMediaUrl(ehProfile.company_stamp);
       const stampBase64 = await getBase64Image(stampUrl);
       if (stampBase64) {
         doc.addImage(stampBase64, 'PNG', margin + 20, sigY, 70, 70);
@@ -276,7 +272,7 @@ export const generateContractPDF = async (job) => {
     }
 
     if (ehProfile.authorized_signature) {
-      const sigUrl = `http://localhost:8000${ehProfile.authorized_signature}`;
+      const sigUrl = getMediaUrl(ehProfile.authorized_signature);
       const sigBase64 = await getBase64Image(sigUrl);
       if (sigBase64) {
         doc.addImage(sigBase64, 'PNG', margin + 40, sigY + 15, 80, 40);

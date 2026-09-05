@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../../api';
 import { Bell, CheckCircle2, FileText, Truck, Check, Factory, FileArchive } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -11,10 +11,9 @@ export default function NotificationsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
         const [jobsRes, challansRes] = await Promise.all([
-          axios.get('http://localhost:8000/api/jobs/', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:8000/api/challans/', { headers: { Authorization: `Bearer ${token}` } })
+          api.get('/api/jobs/'),
+          api.get('/api/challans/')
         ]);
         
         const jobs = jobsRes.data;

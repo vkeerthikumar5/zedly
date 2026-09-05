@@ -3,7 +3,7 @@ import { Users, Star, Factory, Search, ChevronRight, CheckCircle2, X } from 'luc
 import { motion, AnimatePresence } from 'framer-motion';
 import SubcontractorProfileSidebar from '../components/SubcontractorProfileSidebar';
 import VerifiedBadge from '../components/VerifiedBadge';
-import axios from 'axios';
+import api from '../../../api';
 
 export default function SubcontractorNetworkPage() {
   const [selectedSub, setSelectedSub] = useState(null);
@@ -14,10 +14,7 @@ export default function SubcontractorNetworkPage() {
   useEffect(() => {
     const fetchNetwork = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:8000/api/network/', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.get('/api/network/');
         setNetworkData(res.data.network);
         setStats({
            total_partners: res.data.total_partners,

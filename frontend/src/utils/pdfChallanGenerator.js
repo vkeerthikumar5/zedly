@@ -1,23 +1,20 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import axios from 'axios';
+import api, { getMediaUrl } from '../api';
 import { toast } from 'react-hot-toast';
 import QRCode from 'qrcode';
 
 export const generateChallanPDF = async (challan) => {
   try {
-    const token = localStorage.getItem('token');
     // Fetch Admin Profile Data
-    const profileRes = await axios.get('http://localhost:8000/api/profile/', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const profileRes = await api.get('/api/profile/');
     const profileInfo = profileRes.data;
     
     // Convert Export House signature to base64 if it has one
     let signatureB64 = null;
     if (profileInfo.authorized_signature) {
       try {
-         const sigUrl = profileInfo.authorized_signature.startsWith('http') ? profileInfo.authorized_signature : `http://localhost:8000${profileInfo.authorized_signature}`;
+         const sigUrl = getMediaUrl(profileInfo.authorized_signature);
          const response = await fetch(sigUrl);
          const blob = await response.blob();
          signatureB64 = await new Promise((resolve) => {

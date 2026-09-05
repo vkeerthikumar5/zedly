@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Calculator, ArrowUpRight, ArrowDownLeft, AlertCircle, CheckCircle2, AlertTriangle, FileSpreadsheet, Eye, MoreVertical, Truck, X, FileText, Star, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import api, { getMediaUrl } from '../../../api';
 import { useAuth } from '../../../context/AuthContext';
-
-const API_URL = 'http://localhost:8000';
 
 export default function GSTLedgerPage() {
   const [challans, setChallans] = useState([]);
@@ -18,10 +16,9 @@ export default function GSTLedgerPage() {
 
   const fetchLedger = async () => {
     try {
-      const token = localStorage.getItem('token');
       const [challansRes, jobsRes] = await Promise.all([
-         axios.get(`${API_URL}/api/challans/`, { headers: { Authorization: `Bearer ${token}` } }),
-         axios.get(`${API_URL}/api/jobs/`, { headers: { Authorization: `Bearer ${token}` } })
+         api.get('/api/challans/'),
+         api.get('/api/jobs/')
       ]);
       const validChallans = challansRes.data.filter(c => c.status !== 'Draft');
       setChallans(validChallans);
@@ -138,8 +135,7 @@ export default function GSTLedgerPage() {
 
     let profileInfo = {};
     try {
-      const token = localStorage.getItem('token');
-      const profileRes = await axios.get(`${API_URL}/api/profile/`, { headers: { Authorization: `Bearer ${token}` } });
+      const profileRes = await api.get('/api/profile/');
       profileInfo = profileRes.data;
     } catch(e) { console.error("Failed to load profile", e); }
 
@@ -263,8 +259,7 @@ export default function GSTLedgerPage() {
 
   const updateChallanStatus = async (id, newStatus, extraData = {}) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(`${API_URL}/api/challans/${id}/`, { status: newStatus, ...extraData }, { headers: { Authorization: `Bearer ${token}` } });
+      await api.put(`/api/challans/${id}/`, { status: newStatus, ...extraData });
       fetchLedger();
     } catch (err) { console.error(err); }
   };
@@ -461,7 +456,7 @@ export default function GSTLedgerPage() {
                                   onClick={() => { 
                                      setOpenDropdownId(null); 
                                      const pJob = jobs.find(j => j.id === row.challan.job);
-                                     setPhotoModal({ isOpen: true, photoUrl: pJob.completion_proof.startsWith('http') ? pJob.completion_proof : `${API_URL}${pJob.completion_proof}`, jobRef: row.jobIdAndName, timestamp: new Date(pJob.completed_at).toLocaleString() }); 
+                                     setPhotoModal({ isOpen: true, photoUrl: getMediaUrl(pJob.completion_proof), jobRef: row.jobIdAndName, timestamp: new Date(pJob.completed_at).toLocaleString() }); 
                                   }}
                                   className="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-2 border-t border-slate-100"
                                 >

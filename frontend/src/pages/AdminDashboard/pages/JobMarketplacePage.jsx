@@ -3,7 +3,7 @@ import Metrics from '../components/JobMarketplace/Metrics';
 import DataTable from '../components/JobMarketplace/DataTable';
 import BidsScreen from '../components/JobMarketplace/BidsModal';
 import PostJobModal from '../components/JobMarketplace/PostJobModal';
-import axios from 'axios';
+import api from '../../../api';
 import toast from 'react-hot-toast';
 
 export default function JobMarketplacePage() {
@@ -16,10 +16,9 @@ export default function JobMarketplacePage() {
 
   const fetchJobs = async () => {
     try {
-      const token = localStorage.getItem('token');
       const [jobsRes, statsRes] = await Promise.all([
-        axios.get('http://localhost:8000/api/jobs/', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('http://localhost:8000/api/dashboard-stats/', { headers: { Authorization: `Bearer ${token}` } })
+        api.get('/api/jobs/'),
+        api.get('/api/dashboard-stats/')
       ]);
       
       const now = new Date();
@@ -54,10 +53,7 @@ export default function JobMarketplacePage() {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:8000/api/jobs/${jobId}/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/jobs/${jobId}/`);
       toast.success("Job batch deleted successfully!");
       fetchJobs();
     } catch (err) {

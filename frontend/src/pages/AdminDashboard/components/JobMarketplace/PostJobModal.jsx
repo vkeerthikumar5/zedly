@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Calendar, DollarSign, FileText, Upload, HelpCircle, Landmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import api from '../../../../api';
 import toast from 'react-hot-toast';
 
 export default function PostJobModal({ isOpen, onClose, onJobPosted, jobToEdit }) {
@@ -91,10 +91,7 @@ export default function PostJobModal({ isOpen, onClose, onJobPosted, jobToEdit }
 
         const fetchProfileAddress = async () => {
           try {
-            const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:8000/api/profile/', {
-              headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await api.get('/api/profile/');
             if (res.data && res.data.corporate_address) {
               setFormData(prev => ({
                 ...prev,
@@ -206,16 +203,15 @@ export default function PostJobModal({ isOpen, onClose, onJobPosted, jobToEdit }
       dataToSend.append('visible_from_time', calculatedVisibleTime);
 
       const url = jobToEdit 
-        ? `http://localhost:8000/api/jobs/${jobToEdit.id}/` 
-        : 'http://localhost:8000/api/jobs/';
+        ? `/api/jobs/${jobToEdit.id}/` 
+        : '/api/jobs/';
       const method = jobToEdit ? 'PUT' : 'POST';
 
-      await axios({
+      await api({
         method: method,
         url: url,
         data: dataToSend,
         headers: { 
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });

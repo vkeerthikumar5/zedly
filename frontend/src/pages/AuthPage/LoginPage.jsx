@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Factory, EyeOff, Eye, Mail } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../api';
 import { useAuth } from '../../context/AuthContext';
 
 const fadeUp = {
@@ -27,7 +27,7 @@ export default function LoginPage() {
     setError('');
     
     try {
-        const response = await axios.post('http://localhost:8000/api/auth/login/', {
+        const response = await api.post('/api/auth/login/', {
             email,
             password
         });

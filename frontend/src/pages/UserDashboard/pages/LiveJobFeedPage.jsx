@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Briefcase, Target, TrendingUp, Clock, FileEdit, CheckCircle2 } from 'lucide-react';
-import axios from 'axios';
+import api from '../../../api';
 import { toast } from 'react-hot-toast';
 
 export default function LiveJobFeedPage() {
@@ -17,11 +17,7 @@ export default function LiveJobFeedPage() {
 
     const fetchJobs = async (isPolling = false) => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        const response = await axios.get('http://localhost:8000/api/jobs/', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await api.get('/api/jobs/');
         if (active) {
           setJobs(response.data);
         }
@@ -131,10 +127,7 @@ export default function LiveJobFeedPage() {
     }
     try {
       setSubmittingBid(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.post(`http://localhost:8000/api/jobs/${selectedJob.id}/bid/`, bidForm, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.post(`/api/jobs/${selectedJob.id}/bid/`, bidForm);
       toast.success("Official Bid Submitted Successfully!");
       // Optimistically update the job in feed by injecting response
       setJobs(prev => prev.map(j => j.id === selectedJob.id ? { ...j, my_bid: response.data } : j));
@@ -150,10 +143,7 @@ export default function LiveJobFeedPage() {
   const handleCancelBid = async (bidId, jobId) => {
     if (!window.confirm("Are you sure you want to withdraw your bid? This action cannot be undone.")) return;
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:8000/api/bids/${bidId}/delete/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/bids/${bidId}/delete/`);
       toast.success("Bid withdrawn successfully!");
       setJobs(prev => prev.map(j => j.id === jobId ? { ...j, my_bid: null } : j));
     } catch (err) {

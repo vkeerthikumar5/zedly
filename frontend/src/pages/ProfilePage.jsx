@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, Factory, Mail, Lock, CheckCircle2, Loader2 } from 'lucide-react';
-import axios from 'axios';
+import api, { getMediaUrl } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 
@@ -23,11 +23,8 @@ export default function ProfilePage({ role }) {
     setGstStatus('verifying');
     
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:8000/api/profile/verify-gstin/', {
+      const response = await api.post('/api/profile/verify-gstin/', {
         gstin: val
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       
       const verifiedData = response.data;
@@ -80,12 +77,9 @@ export default function ProfilePage({ role }) {
 
     setGstStatus('verifying');
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:8000/api/profile/verify-document/', {
+      const response = await api.post('/api/profile/verify-document/', {
         doc_type: docType,
         id_number: idNum
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
 
       const data = response.data;
@@ -107,10 +101,7 @@ export default function ProfilePage({ role }) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:8000/api/profile/', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.get('/api/profile/');
         setProfileData(res.data);
         if (role === 'admin' && res.data.gstin) {
           setGstStatus('verified');
@@ -156,13 +147,11 @@ export default function ProfilePage({ role }) {
          headers['Content-Type'] = 'multipart/form-data';
       }
 
-      await axios.put('http://localhost:8000/api/profile/', dataOut, {
+      await api.put('/api/profile/', dataOut, {
         headers
       });
       // Refresh user to get new percentage
-      const userRes = await axios.get('http://localhost:8000/api/auth/user/', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const userRes = await api.get('/api/auth/user/');
       setUser(userRes.data);
       setMessage('Profile saved successfully!');
       toast.success('Profile saved successfully!');
@@ -369,7 +358,7 @@ export default function ProfilePage({ role }) {
                     <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Company Rubber Stamp</label>
                     {profileData.company_stamp && typeof profileData.company_stamp === 'string' && (
                        <div className="mb-2 w-32 h-32 border border-slate-200 rounded-lg overflow-hidden bg-white flex items-center justify-center p-2">
-                          <img src={`http://localhost:8000${profileData.company_stamp}`} alt="Stamp" style={{maxWidth: '100%', maxHeight: '100%', objectFit: 'contain'}} />
+                          <img src={getMediaUrl(profileData.company_stamp)} alt="Stamp" style={{maxWidth: '100%', maxHeight: '100%', objectFit: 'contain'}} />
                        </div>
                     )}
                     <input 
@@ -388,7 +377,7 @@ export default function ProfilePage({ role }) {
                     <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Authorized Signature</label>
                     {profileData.authorized_signature && typeof profileData.authorized_signature === 'string' && (
                        <div className="mb-2 w-32 h-20 border border-slate-200 rounded-lg overflow-hidden bg-white flex items-center justify-center p-2">
-                          <img src={`http://localhost:8000${profileData.authorized_signature}`} alt="Signature" style={{maxWidth: '100%', maxHeight: '100%', objectFit: 'contain'}} />
+                          <img src={getMediaUrl(profileData.authorized_signature)} alt="Signature" style={{maxWidth: '100%', maxHeight: '100%', objectFit: 'contain'}} />
                        </div>
                     )}
                     <input 

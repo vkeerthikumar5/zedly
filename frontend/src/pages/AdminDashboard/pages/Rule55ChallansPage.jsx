@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Send, CheckCircle2, AlertTriangle, Search, ChevronRight, X, Plus, Trash2, Edit2, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import api from '../../../api';
 import toast from 'react-hot-toast';
 import { generateChallanPDF } from '../../../utils/pdfChallanGenerator';
 
@@ -31,10 +31,9 @@ export default function Rule55ChallansPage() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('token');
       const [jobsRes, challansRes] = await Promise.all([
-        axios.get('http://localhost:8000/api/jobs/', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('http://localhost:8000/api/challans/', { headers: { Authorization: `Bearer ${token}` } })
+        api.get('/api/jobs/'),
+        api.get('/api/challans/')
       ]);
       setJobs(jobsRes.data.filter(j => j.awarded_bid));
       setChallans(challansRes.data);
@@ -86,10 +85,10 @@ export default function Rule55ChallansPage() {
       };
       
       if (editingChallanId) {
-        await axios.put(`http://localhost:8000/api/challans/${editingChallanId}/`, payload, { headers: { Authorization: `Bearer ${token}` } });
+        await api.put(`/api/challans/${editingChallanId}/`, payload);
         toast.success('Draft Challan Updated.');
       } else {
-        await axios.post('http://localhost:8000/api/challans/', payload, { headers: { Authorization: `Bearer ${token}` } });
+        await api.post('/api/challans/', payload);
         toast.success('Draft Challan Generated safely.');
       }
       
@@ -133,8 +132,7 @@ export default function Rule55ChallansPage() {
       }
 
       try {
-          const token = localStorage.getItem('token');
-          await axios.put(`http://localhost:8000/api/challans/${challan.id}/`, { status: newStatus }, { headers: { Authorization: `Bearer ${token}` } });
+          await api.put(`/api/challans/${challan.id}/`, { status: newStatus });
           toast.success(`Challan updated to ${newStatus}`);
           fetchData();
       } catch(err) {
@@ -167,8 +165,7 @@ export default function Rule55ChallansPage() {
   const handleDelete = async (challanId) => {
       if (!window.confirm("Are you sure you want to delete this challan?")) return;
       try {
-          const token = localStorage.getItem('token');
-          await axios.delete(`http://localhost:8000/api/challans/${challanId}/`, { headers: { Authorization: `Bearer ${token}` } });
+          await api.delete(`/api/challans/${challanId}/`);
           toast.success('Challan deleted');
           fetchData();
       } catch(err) {

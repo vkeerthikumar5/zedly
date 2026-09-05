@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Star, CheckCircle, Clock, MapPin, Factory, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import api from '../../../../api';
 import { toast } from 'react-hot-toast';
 import SubcontractorProfileSidebar from '../SubcontractorProfileSidebar';
 import VerifiedBadge from '../VerifiedBadge';
@@ -13,10 +13,7 @@ export default function BidsModal({ isOpen, onClose, job }) {
   const [selectedProfile, setSelectedProfile] = useState(null);
 
   const fetchBids = () => {
-    const token = localStorage.getItem('token');
-    axios.get(`http://localhost:8000/api/jobs/${job.id}/bids/`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    api.get(`/api/jobs/${job.id}/bids/`)
       .then(res => setBids(res.data))
       .catch(err => {
         console.error(err);
@@ -36,10 +33,7 @@ export default function BidsModal({ isOpen, onClose, job }) {
     if (!window.confirm("Are you sure you want to award this contract?")) return;
     try {
       setActionLoading(bidId);
-      const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:8000/api/bids/${bidId}/award/`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post(`/api/bids/${bidId}/award/`, {});
       toast.success("Contract successfully awarded!");
       fetchBids();
     } catch (err) {
@@ -53,10 +47,7 @@ export default function BidsModal({ isOpen, onClose, job }) {
     if (!window.confirm("Are you sure you want to cancel this contract award?")) return;
     try {
       setActionLoading(bidId);
-      const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:8000/api/bids/${bidId}/cancel/`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post(`/api/bids/${bidId}/cancel/`, {});
       toast.success("Contract award cancelled.");
       fetchBids();
     } catch (err) {
